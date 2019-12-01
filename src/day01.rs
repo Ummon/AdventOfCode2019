@@ -6,11 +6,11 @@ pub fn sum_mass_to_fuel_2(masses: &[i32]) -> i32 {
     masses.iter().fold(0, |sum, mass| sum + mass_to_fuel_2(*mass))
 }
 
-pub fn mass_to_fuel(mass: i32) -> i32 {
+fn mass_to_fuel(mass: i32) -> i32 {
     mass / 3 - 2
 }
 
-pub fn mass_to_fuel_2(mass: i32) -> i32 {
+fn mass_to_fuel_2(mass: i32) -> i32 {
     let mut sum = 0;
     let mut current_mass = mass;
     loop {
