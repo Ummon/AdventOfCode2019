@@ -31,13 +31,13 @@ mod tests {
         assert_eq!(mass_to_fuel(12), 2);
         assert_eq!(mass_to_fuel(14), 2);
         assert_eq!(mass_to_fuel(1969), 654);
-        assert_eq!(mass_to_fuel(100756), 33583);
+        assert_eq!(mass_to_fuel(100_756), 33583);
     }
 
     #[test]
     fn simple_cases_2() {
         assert_eq!(mass_to_fuel_2(14), 2);
         assert_eq!(mass_to_fuel_2(1969), 966);
-        assert_eq!(mass_to_fuel_2(100756), 50346);
+        assert_eq!(mass_to_fuel_2(100_756), 50346);
     }
 }
