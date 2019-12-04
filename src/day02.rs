@@ -19,8 +19,8 @@ fn execute_op_code(code : &mut [i32]) -> i32 {
 
 pub fn find_noun_and_verb(code : &[i32]) -> i32 {
     loop {
-        for noun in 0..=99 {
-            for verb in 0..=99 {
+        for verb in 0..=99 {
+            for noun in 0..=99 {
                 let mut code_copy = Vec::from(code);
                 code_copy[1] = noun;
                 code_copy[2] = verb;
