@@ -26,6 +26,11 @@ fn day03() -> String {
     )
 }
 
+fn day04() -> String {
+    //let code = common::read_list_of_numbers("data/day02.input", ",");
+    format!("part1: {}, part2: {}", "", "")
+}
+
 fn do_day(days: &[fn() -> String], day: usize) {
     let now = Instant::now();
     println!("Result of day {}: {} (time: {} μs)", day, days[day - 1](), now.elapsed().as_micros());
@@ -37,7 +42,8 @@ fn main() {
     let days: Vec<fn() -> String> = vec!(
         day01,
         day02,
-        day03
+        day03,
+        day04
     );
 
     let args: Vec<String> = env::args().skip(1).collect();
