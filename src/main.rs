@@ -21,8 +21,9 @@ fn day03() -> String {
     let file_content = fs::read_to_string("data/day03.input").unwrap();
     let movements: Vec<&str> = file_content.lines().collect();
     format!(
-        "part1: {}",
-        day03::manhattan_distance_from_cross_to_port(&day03::split_movements(&movements[0]), &day03::split_movements(&movements[1]))
+        "part1: {}, part2: {}",
+        day03::manhattan_distance_from_cross_to_port(&day03::split_movements(&movements[0]), &day03::split_movements(&movements[1])),
+        day03::first_cross_sum_of_lengths(&day03::split_movements(&movements[0]), &day03::split_movements(&movements[1]))
     )
 }
 
