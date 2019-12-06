@@ -27,9 +27,19 @@ fn day03() -> String {
     )
 }
 
+fn format_micros(t: u128) -> String {
+    if t < 10_000 {
+        format!("{} μs", t)
+    } else if t < 10_000_000u128 {
+        format!("{} ms", t / 1_000u128)
+    } else {
+        format!("{} s", t / 1_000_000u128)
+    }
+}
+
 fn do_day(days: &[fn() -> String], day: usize) {
     let now = Instant::now();
-    println!("Result of day {}: {} (time: {} μs)", day, days[day - 1](), now.elapsed().as_micros());
+    println!("Result of day {}: {} (time: {})", day, days[day - 1](), format_micros(now.elapsed().as_micros()));
 }
 
 fn main() {
