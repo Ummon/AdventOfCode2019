@@ -5,6 +5,7 @@ use std::time::Instant;
 mod day01;
 mod day02;
 mod day03;
+mod day06;
 mod common;
 
 fn day01() -> String {
@@ -25,6 +26,13 @@ fn day03() -> String {
         day03::manhattan_distance_from_cross_to_port(&day03::split_movements(&movements[0]), &day03::split_movements(&movements[1])),
         day03::first_cross_sum_of_lengths(&day03::split_movements(&movements[0]), &day03::split_movements(&movements[1]))
     )
+}
+
+fn day06() -> String {
+    let file_content = fs::read_to_string("data/day06.input").unwrap();
+    let lines: Vec<&str> = file_content.lines().collect();
+    let orbits = day06::build_orbits(&lines);
+    format!("part1: {}, part2: {}", day06::total_direct_and_indirect_orbits(&orbits), day06::nb_orbital_transfers(&orbits, "SAN", "YOU"))
 }
 
 fn format_micros(t: u128) -> String {
@@ -48,7 +56,8 @@ fn main() {
     let days: Vec<fn() -> String> = vec!(
         day01,
         day02,
-        day03
+        day03,
+        day06
     );
 
     let args: Vec<String> = env::args().skip(1).collect();
