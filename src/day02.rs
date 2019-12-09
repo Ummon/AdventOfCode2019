@@ -1,10 +1,10 @@
-pub fn execute_op_code_with_state_fixed(code : &mut [i32]) -> i32 {
+pub fn execute_op_code_with_state_fixed(code: &mut [i32]) -> i32 {
     code[1] = 12;
     code[2] = 2;
     execute_op_code(code)
 }
 
-fn execute_op_code(code : &mut [i32]) -> i32 {
+fn execute_op_code(code: &mut [i32]) -> i32 {
     let mut cursor = 0;
     loop {
         match code[cursor] {
@@ -17,7 +17,7 @@ fn execute_op_code(code : &mut [i32]) -> i32 {
     }
 }
 
-pub fn find_noun_and_verb(code : &[i32]) -> i32 {
+pub fn find_noun_and_verb(code: &[i32]) -> i32 {
     loop {
         for verb in 0..=99 {
             for noun in 0..=99 {

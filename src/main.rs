@@ -5,6 +5,11 @@ use std::time::Instant;
 mod day01;
 mod day02;
 mod day03;
+mod day05;
+mod day06;
+mod day07;
+mod day08;
+mod day09;
 mod common;
 
 fn day01() -> String {
@@ -28,13 +33,47 @@ fn day03() -> String {
 }
 
 fn day04() -> String {
-    //let code = common::read_list_of_numbers("data/day02.input", ",");
-    format!("part1: {}, part2: {}", "", "")
+    format!("")
+}
+
+fn day05() -> String {
+    let code = common::read_list_of_numbers("data/day05.input", ",");
+    format!("part1: {:?}, part2: {:?}", day05::execute_op_code(&mut Vec::from(&code[..]), &[1]), day05::execute_op_code(&mut Vec::from(&code[..]), &[5]))
+}
+
+fn day06() -> String {
+    let file_content = fs::read_to_string("data/day06.input").unwrap();
+    let lines: Vec<&str> = file_content.lines().collect();
+    let orbits = day06::build_orbits(&lines);
+    format!("part1: {}, part2: {}", day06::total_direct_and_indirect_orbits(&orbits), day06::nb_orbital_transfers(&orbits, "SAN", "YOU"))
+}
+
+fn day07() -> String {
+    format!("")
+}
+
+fn day08() -> String {
+    format!("")
+}
+
+fn day09() -> String {
+    let code = common::read_list_of_numbers("data/day09.input", ",");
+    format!("part1: {:?}, part2: {:?}", day09::execute_op_code(&code, &[1]), day09::execute_op_code(&code, &[2]))
+}
+
+fn format_micros(t: u128) -> String {
+    if t < 10_000 {
+        format!("{} μs", t)
+    } else if t < 10_000_000u128 {
+        format!("{} ms", t / 1_000u128)
+    } else {
+        format!("{} s", t / 1_000_000u128)
+    }
 }
 
 fn do_day(days: &[fn() -> String], day: usize) {
     let now = Instant::now();
-    println!("Result of day {}: {} (time: {} μs)", day, days[day - 1](), now.elapsed().as_micros());
+    println!("Result of day {}: {} (time: {})", day, days[day - 1](), format_micros(now.elapsed().as_micros()));
 }
 
 fn main() {
@@ -44,7 +83,16 @@ fn main() {
         day01,
         day02,
         day03,
+<<<<<<< HEAD
         day04
+=======
+        day04,
+        day05,
+        day06,
+        day07,
+        day08,
+        day09
+>>>>>>> 91620914391b197fab0624a627f1b0a24ff75364
     );
 
     let args: Vec<String> = env::args().skip(1).collect();
