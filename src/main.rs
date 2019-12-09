@@ -6,6 +6,7 @@ mod day01;
 mod day02;
 mod day03;
 mod day05;
+mod day06;
 mod common;
 
 fn day01() -> String {
@@ -28,9 +29,26 @@ fn day03() -> String {
     )
 }
 
+fn day06() -> String {
+    let file_content = fs::read_to_string("data/day06.input").unwrap();
+    let lines: Vec<&str> = file_content.lines().collect();
+    let orbits = day06::build_orbits(&lines);
+    format!("part1: {}, part2: {}", day06::total_direct_and_indirect_orbits(&orbits), day06::nb_orbital_transfers(&orbits, "SAN", "YOU"))
+}
+
+fn format_micros(t: u128) -> String {
+    if t < 10_000 {
+        format!("{} μs", t)
+    } else if t < 10_000_000u128 {
+        format!("{} ms", t / 1_000u128)
+    } else {
+        format!("{} s", t / 1_000_000u128)
+    }
+}
+
 fn do_day(days: &[fn() -> String], day: usize) {
     let now = Instant::now();
-    println!("Result of day {}: {} (time: {} μs)", day, days[day - 1](), now.elapsed().as_micros());
+    println!("Result of day {}: {} (time: {})", day, days[day - 1](), format_micros(now.elapsed().as_micros()));
 }
 
 fn main() {
@@ -39,7 +57,8 @@ fn main() {
     let days: Vec<fn() -> String> = vec!(
         day01,
         day02,
-        day03
+        day03,
+        day06
     );
 
     let args: Vec<String> = env::args().skip(1).collect();
