@@ -5,6 +5,7 @@ use std::time::Instant;
 mod day01;
 mod day02;
 mod day03;
+mod day05;
 mod common;
 
 fn day01() -> String {
