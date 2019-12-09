@@ -29,6 +29,15 @@ fn day03() -> String {
     )
 }
 
+fn day04() -> String {
+    format!("")
+}
+
+fn day05() -> String {
+    let code = common::read_list_of_numbers("data/day05.input", ",");
+    format!("part1: {:?}, part2: {:?}", day05::execute_op_code(&mut Vec::from(&code[..]), &[1]), day05::execute_op_code(&mut Vec::from(&code[..]), &[5]))
+}
+
 fn day06() -> String {
     let file_content = fs::read_to_string("data/day06.input").unwrap();
     let lines: Vec<&str> = file_content.lines().collect();
@@ -58,6 +67,8 @@ fn main() {
         day01,
         day02,
         day03,
+        day04,
+        day05,
         day06
     );
 
