@@ -53,11 +53,16 @@ fn day07() -> String {
 }
 
 fn day08() -> String {
-    format!("")
+    let img = fs::read_to_string("data/day08.input").unwrap();
+
+    let raw = day08::read_from_string(&img);
+    let layers = day08::decode_image(&raw, 25, 6);
+    let layer = day08::layer_with_fewer_0(&layers[..]);
+    format!("part1: {}, part2: {}", day08::one_digits_times_two_digits(layer), 1)
 }
 
 fn day09() -> String {
-    let code = common::read_list_of_numbers("data/day09.input", ",");
+    let code = common::read_list_of_numbers::<&str, i64>("data/day09.input", ",");
     format!("part1: {:?}, part2: {:?}", day09::execute_op_code(&code, &[1]), day09::execute_op_code(&code, &[2]))
 }
 
