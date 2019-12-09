@@ -83,16 +83,12 @@ fn main() {
         day01,
         day02,
         day03,
-<<<<<<< HEAD
-        day04
-=======
         day04,
         day05,
         day06,
         day07,
         day08,
         day09
->>>>>>> 91620914391b197fab0624a627f1b0a24ff75364
     );
 
     let args: Vec<String> = env::args().skip(1).collect();
