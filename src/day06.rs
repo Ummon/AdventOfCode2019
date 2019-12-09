@@ -17,11 +17,9 @@ fn parents<'a>(orbits: &'a Orbits, planet: &str) -> Vec<&'a str> {
     let mut parents = Vec::<&str>::new();
     let mut current_planet = planet;
 
-    loop {
-        match orbits.get(current_planet) {
-            Some (parent) => { parents.insert(0, parent); current_planet = parent; },
-            None => break
-        }
+    while let Some (parent) = orbits.get(current_planet) {
+        parents.insert(0, parent);
+        current_planet = parent;
     }
 
     parents
