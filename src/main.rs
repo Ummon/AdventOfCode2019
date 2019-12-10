@@ -57,8 +57,14 @@ fn day08() -> String {
 
     let raw = day08::read_from_string(&img);
     let layers = day08::decode_image(&raw, 25, 6);
+
     let layer = day08::layer_with_fewer_0(&layers[..]);
-    format!("part1: {}, part2: {}", day08::one_digits_times_two_digits(layer), 1)
+    let result = day08::merge_layers(&layers[..]);
+
+    let img_output = "data/day08.png";
+    day08::write_layer(&result, 25, 6, img_output);
+
+    format!("part1: {}, part2: {}", day08::one_digits_times_two_digits(layer), img_output)
 }
 
 fn day09() -> String {

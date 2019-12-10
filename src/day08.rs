@@ -13,29 +13,47 @@ pub fn decode_image(digits: &[u8], width: usize, height: usize) -> Vec<Vec<u8>> 
     layers
 }
 
-pub fn layer_with_fewer_0(layers: &[Vec<u8>]) -> &Vec<u8> {
-    let mut min = std::u32::MAX;
-    let mut layer_min = 0;
-    for i in 0 .. layers.len() {
-        let sum = layers[i].iter().fold(0, |sum, pix| if *pix == 0u8 { sum + 1 } else { sum });
-        if sum < min {
-            min = sum;
-            layer_min = i;
-        }
-    }
-    &layers[layer_min]
+fn count(layer: &[u8], value: u8) -> u32 {
+    layer.iter().fold(0, |sum, pix| if *pix == value { sum + 1 } else { sum })
 }
 
-pub fn one_digits_times_two_digits(layer: &[u8]) -> i32 {
-    let (nb_1, nb_2) =
-        layer
-            .iter()
-            .fold(
-                (0, 0),
-                |(nb_1, nb_2), pix|
-                    match *pix { 1u8 => (nb_1 + 1, nb_2), 2u8 => (nb_1, nb_2 + 1), _ => (nb_1, nb_2)}
-            );
-    nb_1 * nb_2
+pub fn layer_with_fewer_0(layers: &[Vec<u8>]) -> &Vec<u8> {
+    let mut min = std::u32::MAX;
+    let mut layer_min: &Vec<u8> = &layers[0];
+    for layer in layers {
+        let sum = count(&layer, 0u8);
+        if sum < min {
+            min = sum;
+            layer_min = layer;
+        }
+    }
+    layer_min
+}
+
+pub fn merge_layers(layers: &[Vec<u8>]) -> Vec<u8> {
+    let size = layers[0].len();
+    let mut result: Vec<u8> = Vec::new();
+    result.resize(size, 0);
+
+    for i in 0 .. size {
+        for layer in layers {
+            if layer[i] != 2 {
+                result[i] = layer[i];
+                break;
+            }
+        }
+    }
+
+    result
+}
+
+pub fn write_layer<P : AsRef<std::path::Path>>(layer: &[u8], width: u32, height: u32, to: P) {
+    let layer_normalized: Vec<u8> = layer.iter().map(|v| v * 255).collect();
+    let _ = image::save_buffer(to, &layer_normalized, width, height, image::Gray(8));
+}
+
+pub fn one_digits_times_two_digits(layer: &[u8]) -> u32 {
+    count(layer, 1) * count(layer, 2)
 }
 
 #[cfg(test)]
@@ -48,5 +66,13 @@ mod tests {
         let layers = decode_image(&raw, 3, 2);
         let layer = layer_with_fewer_0(&layers[..]);
         assert_eq!(one_digits_times_two_digits(layer), 1);
+    }
+
+    #[test]
+    fn part2() {
+        let raw = read_from_string("0222112222120000");
+        let layers = decode_image(&raw, 2, 2);
+        let layer = merge_layers(&layers[..]);
+        assert_eq!(layer, vec![0, 1, 1, 0]);
     }
 }
