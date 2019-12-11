@@ -10,6 +10,7 @@ mod day03;
 mod day06;
 mod day07;
 mod day08;
+mod day10;
 mod day11;
 
 fn day01() -> String {
@@ -71,7 +72,8 @@ fn day09() -> String {
 }
 
 fn day10() -> String {
-    format!("")
+    let map = day10::read_map(&fs::read_to_string("data/day10.input").unwrap());
+    format!("part1: {}, part2: {}", day10::find_best_location(&map).0, "")
 }
 
 fn day11() -> String {
