@@ -5,6 +5,35 @@ enum Mode {
     Relative
 }
 
+pub trait IO {
+    fn read(&mut self) -> i64;
+    fn write(&mut self, value: i64);
+}
+
+struct Buffer {
+    output: Vec<i64>,
+    input: Vec<i64>
+}
+
+impl Buffer {
+    fn from(input: &[i64]) -> Self {
+        Buffer {
+            output: Vec::new(),
+            input: Vec::from(input)
+        }
+    }
+}
+
+impl IO for Buffer {
+    fn read(&mut self) -> i64 {
+        self.input.remove(0)
+    }
+
+    fn write(&mut self, value: i64) {
+        self.output.push(value)
+    }
+}
+
 // 'true' -> immediate mode, 'false' -> position mode.
 fn read_op_and_modes(mut code: i64) -> (i64, [Mode; 3]) {
     let mut modes: [Mode; 3] = [ Mode::Position, Mode::Position, Mode::Position ];
@@ -24,10 +53,14 @@ fn read_op_and_modes(mut code: i64) -> (i64, [Mode; 3]) {
 }
 
 pub fn execute_op_code(code: &[i64], input: &[i64]) -> Vec<i64> {
+    let mut buffer = Buffer::from(input);
+    execute_op_code_with_custom_io(code, &mut buffer);
+    buffer.output
+}
+
+pub fn execute_op_code_with_custom_io(code: &[i64], io: &mut dyn IO) {
     let mut code = Vec::from(code);
     let mut cursor = 0;
-    let mut input_cursor = 0;
-    let mut output = Vec::<i64>::new();
     let mut relative_base = 0;
 
     fn read(position: usize, code: &[i64], mode: Mode, relative_base: i64) -> i64 {
@@ -82,14 +115,13 @@ pub fn execute_op_code(code: &[i64], input: &[i64]) -> Vec<i64> {
 
             // Input.
             3 => {
-                write(cursor + 1, input[input_cursor], &mut code, modes[0], relative_base);
-                input_cursor += 1;
+                write(cursor + 1, io.read(), &mut code, modes[0], relative_base);
                 cursor += 2;
             }
 
             // Output.
             4 => {
-                output.push(read(cursor + 1, &code, modes[0], relative_base));
+                io.write(read(cursor + 1, &code, modes[0], relative_base));
                 cursor += 2;
             }
 
@@ -119,14 +151,32 @@ pub fn execute_op_code(code: &[i64], input: &[i64]) -> Vec<i64> {
 
             99 => break,
 
-            _ => panic!("Unkown code: {}", code[cursor])
+            _ => panic!("Unknown code: {}", code[cursor])
         }
     }
-    output
 }
 
 #[cfg(test)]
-mod tests {
+mod tests_day05 {
+    use super::*;
+
+    #[test]
+    fn part2() {
+        let c = [3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99];
+
+        let r1 = execute_op_code(&c, &[7]);
+        assert_eq!(r1[0], 999);
+
+        let r2 = execute_op_code(&c, &[8]);
+        assert_eq!(r2[0], 1000);
+
+        let r3 = execute_op_code(&c, &[9]);
+        assert_eq!(r3[0], 1001);
+    }
+}
+
+#[cfg(test)]
+mod tests_day09 {
     use super::*;
 
     #[test]

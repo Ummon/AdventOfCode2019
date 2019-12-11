@@ -41,7 +41,7 @@ pub fn nb_orbital_transfers(orbits: &Orbits, loc1: &str, loc2: &str) -> usize {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     #[test]

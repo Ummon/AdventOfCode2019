@@ -47,24 +47,6 @@ pub fn merge_layers(layers: &[Vec<u8>]) -> Vec<u8> {
     result
 }
 
-pub fn layer_to_printable_string(layer: &[u8], width: u32) -> String {
-    let mut result = String::new();
-    let mut i = 0;
-
-    loop {
-        for _ in 0 .. width {
-            if layer[i] == 0 {
-                result += " ";
-            } else {
-                result += "█";
-            }
-            i += 1;
-            if i >= layer.len() { return result }
-        }
-        result += "\n";
-    }
-}
-
 pub fn one_digits_times_two_digits(layer: &[u8]) -> u32 {
     count(layer, 1) * count(layer, 2)
 }

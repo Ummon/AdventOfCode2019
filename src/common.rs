@@ -11,3 +11,21 @@ where
 {
     fs::read_to_string(file).unwrap().split(sep).map(|line| line.parse::<T>().unwrap()).collect()
 }
+
+pub fn layer_to_printable_string(layer: &[u8], width: usize) -> String {
+    let mut result = String::new();
+    let mut i = 0;
+
+    loop {
+        for _ in 0 .. width {
+            if layer[i] == 0 {
+                result += " ";
+            } else {
+                result += "█";
+            }
+            i += 1;
+            if i >= layer.len() { return result }
+        }
+        result += "\n";
+    }
+}

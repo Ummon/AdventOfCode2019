@@ -11,7 +11,7 @@ fn execute_op_code(code: &mut [i32]) -> i32 {
             1 => code[code[cursor + 3] as usize] = code[code[cursor + 1] as usize] + code[code[cursor + 2] as usize],
             2 => code[code[cursor + 3] as usize] = code[code[cursor + 1] as usize] * code[code[cursor + 2] as usize],
             99 => return code[0],
-            _ => panic!("Unkown code: {}", code[cursor])
+            _ => panic!("Unknown code: {}", code[cursor])
         }
         cursor += 4;
     }

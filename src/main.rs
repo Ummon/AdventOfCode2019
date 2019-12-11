@@ -2,15 +2,15 @@ use std::env;
 use std::fs;
 use std::time::Instant;
 
+mod common;
+mod intcode;
 mod day01;
 mod day02;
 mod day03;
-mod day05;
 mod day06;
 mod day07;
 mod day08;
-mod day09;
-mod common;
+mod day11;
 
 fn day01() -> String {
     let masses = common::read_list_of_numbers("data/day01.input", "\n");
@@ -38,7 +38,7 @@ fn day04() -> String {
 
 fn day05() -> String {
     let code = common::read_list_of_numbers("data/day05.input", ",");
-    format!("part1: {:?}, part2: {:?}", day05::execute_op_code(&mut Vec::from(&code[..]), &[1]), day05::execute_op_code(&mut Vec::from(&code[..]), &[5]))
+    format!("part1: {:?}, part2: {:?}", intcode::execute_op_code(&code, &[1]), intcode::execute_op_code(&code, &[5]))
 }
 
 fn day06() -> String {
@@ -61,12 +61,25 @@ fn day08() -> String {
     let layer = day08::layer_with_fewer_0(&layers[..]);
     let merged = day08::merge_layers(&layers[..]);
 
-    format!("part1: {}, part2:\n{}", day08::one_digits_times_two_digits(layer), day08::layer_to_printable_string(&merged, 25))
+    format!("part1: {}, part2:\n{}", day08::one_digits_times_two_digits(layer), common::layer_to_printable_string(&merged, 25))
 }
 
 fn day09() -> String {
     let code = common::read_list_of_numbers::<&str, i64>("data/day09.input", ",");
-    format!("part1: {:?}, part2: {:?}", day09::execute_op_code(&code, &[1]), day09::execute_op_code(&code, &[2]))
+
+    format!("part1: {:?}, part2: {:?}", intcode::execute_op_code(&code, &[1]), intcode::execute_op_code(&code, &[2]))
+}
+
+fn day10() -> String {
+    format!("")
+}
+
+fn day11() -> String {
+    let code = common::read_list_of_numbers::<&str, i64>("data/day11.input", ",");
+    let panels = day11::run_robot(&code, 1);
+    let (layer, width) = day11::panels_to_layer(&panels);
+
+    format!("part1: {:?}, part2:\n{}", day11::run_robot(&code, 0).len(), common::layer_to_printable_string(&layer, width))
 }
 
 fn format_micros(t: u128) -> String {
@@ -96,7 +109,9 @@ fn main() {
         day06,
         day07,
         day08,
-        day09
+        day09,
+        day10,
+        day11
     );
 
     let args: Vec<String> = env::args().skip(1).collect();
