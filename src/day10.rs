@@ -55,23 +55,19 @@ pub fn location_nth_vaporized_asteroid(pos: (i32, i32), map: &[(i32, i32)], n: u
         }
     }
 
-    let mut sorted_angles: Vec<i64> = asteroids.keys().copied().collect();
-    sorted_angles.sort();
-
-    asteroids.values_mut().for_each(|lineup_asteroids| lineup_asteroids.sort_by(|(_, l1), (_, l2)| l1.cmp(l2)));
+    // Sort everything by angle and by distance.
+    let mut sorted_asteroids: Vec<(&i64, &mut Vec<((i32, i32), i64)>)> = asteroids.iter_mut().collect();
+    sorted_asteroids.sort_by(|(a1, _), (a2, _)| a1.cmp(a2));
+    for (_, lineup_asteroids) in sorted_asteroids.iter_mut() {
+        lineup_asteroids.sort_by(|(_, l1), (_, l2)| l1.cmp(l2))
+    }
 
     let mut i = 1;
     loop {
-        for angle in &sorted_angles {
-            if let Some (lineup_asteroids) = asteroids.get_mut(angle) {
-                let ((x, y), _) = lineup_asteroids.remove(0);
-                if i == n {
-                    return (x, y)
-                } else if lineup_asteroids.is_empty() {
-                    asteroids.remove(angle);
-                }
-                i += 1;
-            }
+        for (_, lineup_asteroids) in sorted_asteroids.iter_mut() {
+            let ((x, y), _) = lineup_asteroids.remove(0);
+            if i == n { return (x, y) }
+            i += 1;
         }
     }
 }

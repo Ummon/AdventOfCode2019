@@ -98,7 +98,7 @@ fn format_micros(t: u128) -> String {
 
 fn do_day(days: &[fn() -> String], day: usize) {
     let now = Instant::now();
-    println!("Result of day {}: {} (time: {})", day, days[day - 1](), format_micros(now.elapsed().as_micros()));
+    println!("Result of day {:02}: {} (time: {})", day, days[day - 1](), format_micros(now.elapsed().as_micros()));
 }
 
 fn main() {

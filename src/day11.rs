@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use super::intcode;
 
 enum NextCommand {
-    ColorToPaint,
+    Paint,
     Turn
 }
 
@@ -16,7 +16,7 @@ struct Robot {
 impl Robot {
     fn new() -> Self {
         Robot {
-            next_command: NextCommand::ColorToPaint,
+            next_command: NextCommand::Paint,
             current_pos: (0, 0),
             current_dir: 0,
             panels: HashMap::new()
@@ -32,7 +32,7 @@ impl intcode::IO for Robot {
     fn write(&mut self, value: i64) {
         self.next_command =
             match self.next_command {
-                NextCommand::ColorToPaint => { self.panels.insert(self.current_pos, value); NextCommand::Turn },
+                NextCommand::Paint => { self.panels.insert(self.current_pos, value); NextCommand::Turn },
                 NextCommand::Turn => {
                     self.current_dir = (self.current_dir + if value == 0 /* Turn left. */ { 3 } else /* Turn right. */ { 1 }) % 4;
                     let (x, y) = self.current_pos;
@@ -43,7 +43,7 @@ impl intcode::IO for Robot {
                             2     => (x    , y - 1),
                             3 | _ => (x - 1, y    )
                         };
-                    NextCommand::ColorToPaint
+                    NextCommand::Paint
                 }
             }
     }
