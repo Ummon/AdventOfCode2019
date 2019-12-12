@@ -4,8 +4,8 @@ pub fn read_map(raw: &str) -> Vec<(i32, i32)> {
     let lines: Vec<&str> = raw.lines().map(|l| l.trim()).collect();
     let mut map = Vec::<(i32, i32)>::new();
     for x in 0 .. lines[0].len() {
-        for y in 0 .. lines.len() {
-            if lines[y].chars().nth(x) == Some('#') {
+        for (y, line) in lines.iter().enumerate() {
+            if line.chars().nth(x) == Some('#') {
                 map.push((x as i32, y as i32));
             }
         }
@@ -41,9 +41,11 @@ pub fn find_best_location(map: &[(i32, i32)]) -> (usize, (i32, i32)) {
     (best_nb_observable_asteroid, (best_x, best_y))
 }
 
+type PositionsAndDistances = Vec<((i32, i32), i64)>;
+
 pub fn location_nth_vaporized_asteroid(pos: (i32, i32), map: &[(i32, i32)], n: usize) -> (i32, i32) {
     // Angle -> [(position, distance)].
-    let mut asteroids = HashMap::<i64, Vec<((i32, i32), i64)>>::new();
+    let mut asteroids = HashMap::<i64, PositionsAndDistances>::new();
 
     let (x1, y1) = pos;
     for (x2, y2) in map {
@@ -56,7 +58,7 @@ pub fn location_nth_vaporized_asteroid(pos: (i32, i32), map: &[(i32, i32)], n: u
     }
 
     // Sort everything by angle and by distance.
-    let mut sorted_asteroids: Vec<(&i64, &mut Vec<((i32, i32), i64)>)> = asteroids.iter_mut().collect();
+    let mut sorted_asteroids: Vec<(&i64, &mut PositionsAndDistances)> = asteroids.iter_mut().collect();
     sorted_asteroids.sort_by(|(a1, _), (a2, _)| a1.cmp(a2));
     for (_, lineup_asteroids) in sorted_asteroids.iter_mut() {
         lineup_asteroids.sort_by(|(_, l1), (_, l2)| l1.cmp(l2))
