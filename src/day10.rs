@@ -42,7 +42,7 @@ pub fn find_best_location(map: &[(i32, i32)]) -> (usize, (i32, i32)) {
 }
 
 pub fn location_nth_vaporized_asteroid(pos: (i32, i32), map: &[(i32, i32)], n: usize) -> (i32, i32) {
-    // Angle -> []
+    // Angle -> [(position, distance)].
     let mut asteroids = HashMap::<i64, Vec<((i32, i32), i64)>>::new();
 
     let (x1, y1) = pos;
@@ -59,10 +59,6 @@ pub fn location_nth_vaporized_asteroid(pos: (i32, i32), map: &[(i32, i32)], n: u
     sorted_angles.sort();
 
     asteroids.values_mut().for_each(|lineup_asteroids| lineup_asteroids.sort_by(|(_, l1), (_, l2)| l1.cmp(l2)));
-
-    dbg!(&sorted_angles);
-    dbg!(&asteroids);
-    //return (0, 0);
 
     let mut i = 1;
     loop {
@@ -185,11 +181,12 @@ mod tests {
              ..#.#.....#....##";
         let map = read_map(raw_map);
         let pos = (8, 3);
-        let pos_200th = location_nth_vaporized_asteroid(pos, &map, 200);
-        dbg!(pos_200th);
-        assert_eq!(2, 210);
+        let pos_9th = location_nth_vaporized_asteroid(pos, &map, 9);
+        assert_eq!(pos_9th, (15, 1));
+
+        let pos_18th = location_nth_vaporized_asteroid(pos, &map, 18);
+        assert_eq!(pos_18th, (4, 4));
     }
-    /*
 
     #[test]
     fn part2_sample_2() {
@@ -217,8 +214,6 @@ mod tests {
         let map = read_map(raw_map);
         let pos = find_best_location(&map).1;
         let pos_200th = location_nth_vaporized_asteroid(pos, &map, 200);
-        dbg!(pos_200th);
-        assert_eq!(2, 210);
+        assert_eq!(pos_200th, (8, 2));
     }
-    */
 }

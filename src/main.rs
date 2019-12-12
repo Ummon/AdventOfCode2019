@@ -73,7 +73,9 @@ fn day09() -> String {
 
 fn day10() -> String {
     let map = day10::read_map(&fs::read_to_string("data/day10.input").unwrap());
-    format!("part1: {}, part2: {}", day10::find_best_location(&map).0, "")
+    let (n, location) = day10::find_best_location(&map);
+    let (x, y) = day10::location_nth_vaporized_asteroid(location, &map, 200);
+    format!("part1: {}, part2: {}", n, x * 100 + y)
 }
 
 fn day11() -> String {

@@ -34,13 +34,14 @@ impl intcode::IO for Robot {
             match self.next_command {
                 NextCommand::ColorToPaint => { self.panels.insert(self.current_pos, value); NextCommand::Turn },
                 NextCommand::Turn => {
-                    self.current_dir = (self.current_dir + if value == 0 { 3 } else { 1 }) % 4;
+                    self.current_dir = (self.current_dir + if value == 0 /* Turn left. */ { 3 } else /* Turn right. */ { 1 }) % 4;
+                    let (x, y) = self.current_pos;
                     self.current_pos =
                         match self.current_dir {
-                            0 => (self.current_pos.0, self.current_pos.1 + 1),
-                            1 => (self.current_pos.0 + 1, self.current_pos.1),
-                            2 => (self.current_pos.0, self.current_pos.1 - 1),
-                            3 | _ => (self.current_pos.0 - 1, self.current_pos.1)
+                            0     => (x    , y + 1),
+                            1     => (x + 1, y    ),
+                            2     => (x    , y - 1),
+                            3 | _ => (x - 1, y    )
                         };
                     NextCommand::ColorToPaint
                 }
@@ -112,5 +113,4 @@ mod tests {
 
         assert_eq!(robot.panels.len(), 6);
     }
-
 }
