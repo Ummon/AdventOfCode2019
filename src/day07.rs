@@ -17,12 +17,6 @@ struct Stage {
     last_produced_value: i64
 }
 
-impl Stage {
-    fn new(input_channel: mpsc::Receiver<i64>, output_channel: mpsc::Sender<i64>) -> Self {
-        Stage { input_channel, output_channel, last_produced_value: 0 }
-    }
-}
-
 impl intcode::IO for Stage {
     // May block.
     fn read(&mut self) -> i64 {
@@ -65,7 +59,7 @@ fn last_thruster_signal_with_feedback_loop(code: &[i64], phase_setting: &[i64]) 
                     let code_copy = Vec::<i64>::from(code);
                     thread::spawn(
                         move || {
-                            let mut stage = Stage::new(receiver, sender);
+                            let mut stage = Stage { input_channel: receiver, output_channel: sender, last_produced_value: 0 };
                             intcode::execute_op_code_with_custom_io(&code_copy, &mut stage);
                             stage.last_produced_value
                         }
@@ -117,6 +111,6 @@ mod tests {
     fn part2_sample_2() {
         let code = vec![3,52,1001,52,-5,52,3,53,1,52,56,54,1007,54,5,55,1005,55,26,1001,54,-5,54,1105,1,12,1,53,54,53,1008,54,0,55,1001,55,1,55,2,53,55,53,4,53,1001,56,-1,56,1005,56,6,99,0,0,0,0,10];
         let phase_setting = [9,7,8,5,6];
-        assert_eq!(last_thruster_signal_with_feedback_loop(&code, &phase_setting), 18216);
+        assert_eq!(last_thruster_signal_with_feedback_loop(&code, &phase_setting), 18_216);
     }
 }
