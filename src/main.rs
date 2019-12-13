@@ -50,7 +50,9 @@ fn day06() -> String {
 }
 
 fn day07() -> String {
-    format!("")
+    let code = common::read_list_of_numbers("data/day07.input", ",");
+
+    format!("part1: {}, part2: {}", day07::find_largest_last_thruster_signal(&code), day07::find_largest_last_thruster_signal_with_feedback_loop(&code))
 }
 
 fn day08() -> String {
@@ -122,9 +124,11 @@ fn main() {
 
     // No argument -> execute all day problems.
     if args.is_empty() {
-        for i in 1..=days.len() {
+        let now = Instant::now();
+        for i in 1 ..= days.len() {
             do_day(&days, i)
         }
+        println!("Time to execute all days: {}", format_micros(now.elapsed().as_micros()));
     } else {
         for arg in args {
             let day = arg.parse::<usize>().unwrap();
