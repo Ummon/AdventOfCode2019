@@ -12,6 +12,7 @@ mod day07;
 mod day08;
 mod day10;
 mod day11;
+mod day12;
 
 fn day01() -> String {
     let masses = common::read_list_of_numbers("data/day01.input", "\n");
@@ -88,6 +89,11 @@ fn day11() -> String {
     format!("part1: {:?}, part2:\n{}", day11::run_robot(&code, 0).len(), common::layer_to_printable_string(&layer, width))
 }
 
+fn day12() -> String {
+    let coordinates = day12::parse_positions(&fs::read_to_string("data/day12.input").unwrap());
+    format!("part1: {}, part2: {}", day12::final_energy(&coordinates, 1000), day12::find_same_state(&coordinates))
+}
+
 fn format_micros(t: u128) -> String {
     if t < 10_000 {
         format!("{} μs", t)
@@ -117,7 +123,8 @@ fn main() {
         day08,
         day09,
         day10,
-        day11
+        day11,
+        day12
     );
 
     let args: Vec<String> = env::args().skip(1).collect();
