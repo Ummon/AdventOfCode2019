@@ -13,6 +13,7 @@ mod day08;
 mod day10;
 mod day11;
 mod day12;
+mod day13;
 
 fn day01() -> String {
     let masses = common::read_list_of_numbers("data/day01.input", "\n");
@@ -94,6 +95,13 @@ fn day12() -> String {
     format!("part1: {}, part2: {}", day12::final_energy(&coordinates, 1000), day12::find_same_state(&coordinates))
 }
 
+fn day13() -> String {
+    let code = common::read_list_of_numbers::<&str, i64>("data/day13.input", ",");
+    let mut modified_code = Vec::from(&code[..]);
+    modified_code[0] = 2;
+    format!("part1: {}, part2: {}", day13::count_nb_block(&code), day13::final_score(&modified_code))
+}
+
 fn format_micros(t: u128) -> String {
     if t < 10_000 {
         format!("{} μs", t)
@@ -124,7 +132,8 @@ fn main() {
         day09,
         day10,
         day11,
-        day12
+        day12,
+        day13,
     );
 
     let args: Vec<String> = env::args().skip(1).collect();
