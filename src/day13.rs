@@ -3,7 +3,7 @@ use std::convert::TryFrom;
 use itertools::Itertools;
 use num_enum::TryFromPrimitive;
 
-// Not neccesary, to try to parse enum.
+// Not neccesary, to try to parse enum in Rust.
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
 #[repr(u8)]
 enum Tile {
@@ -42,7 +42,7 @@ impl intcode::IO for State {
     fn write(&mut self, value: i64) {
         self.buffer.push(value);
         if self.buffer.len() == 3 {
-            if self.buffer[0] == -1 {
+            if self.buffer[0] == -1 && self.buffer[1] == 0 {
                 self.score = self.buffer[2];
             } else {
                 let tile = Tile::try_from(self.buffer[2] as u8).unwrap();
