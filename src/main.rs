@@ -15,6 +15,7 @@ mod day11;
 mod day12;
 mod day13;
 mod day14;
+mod day15;
 
 fn day01() -> String {
     let masses = common::read_list_of_numbers("data/day01.input", "\n");
@@ -110,6 +111,11 @@ fn day14() -> String {
     format!("part1: {}, part2: {}", ore_per_fuel, day14::fuel_produced(&reactions, 1_000_000_000_000, ore_per_fuel))
 }
 
+fn day15() -> String {
+    //let code = common::read_list_of_numbers("data/day15.input", ",");
+    format!("part1: {}, part2: {}", "", "")
+}
+
 fn format_micros(t: u128) -> String {
     if t < 10_000 {
         format!("{} μs", t)
@@ -143,6 +149,7 @@ fn main() {
         day12,
         day13,
         day14,
+        day15,
     );
 
     let args: Vec<String> = env::args().skip(1).collect();
