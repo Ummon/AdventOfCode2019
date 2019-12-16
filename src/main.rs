@@ -103,6 +103,13 @@ fn day13() -> String {
     format!("part1: {}, part2: {}", day13::count_nb_block(&code), day13::final_score(&modified_code))
 }
 
+fn day14() -> String {
+    let reactions = day14::parse(&fs::read_to_string("data/day14.input").unwrap());
+
+    let ore_per_fuel = day14::ore_needed_per_fuel(&reactions);
+    format!("part1: {}, part2: {}", ore_per_fuel, day14::fuel_produced(&reactions, 1_000_000_000_000, ore_per_fuel))
+}
+
 fn format_micros(t: u128) -> String {
     if t < 10_000 {
         format!("{} μs", t)
@@ -135,6 +142,7 @@ fn main() {
         day11,
         day12,
         day13,
+        day14,
     );
 
     let args: Vec<String> = env::args().skip(1).collect();

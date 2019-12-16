@@ -132,6 +132,6 @@ mod tests {
              <x=2, y=-7, z=3>
              <x=9, y=-8, z=-3>";
         let coordinates = parse_positions(input);
-        assert_eq!(find_same_state(&coordinates), 4686774924);
+        assert_eq!(find_same_state(&coordinates), 4_686_774_924);
     }
 }
