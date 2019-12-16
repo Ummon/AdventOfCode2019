@@ -8,6 +8,7 @@ enum Mode {
 pub trait IO {
     fn read(&mut self) -> i64;
     fn write(&mut self, value: i64);
+    fn halt(&self) -> bool { false }
 }
 
 struct Buffer {
@@ -98,6 +99,8 @@ pub fn execute_op_code_with_custom_io(code: &[i64], io: &mut dyn IO) {
     };
 
     loop {
+        if io.halt() { break; }
+
         let (op, modes) = read_op_and_modes(code[cursor]);
 
         match op {
