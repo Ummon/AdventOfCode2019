@@ -113,7 +113,8 @@ fn day14() -> String {
 
 fn day15() -> String {
     let code = common::read_list_of_numbers("data/day15.input", ",");
-    format!("part1: {}, part2: {}", day15::nb_of_movement_to_reach_oxygen(&code), "")
+    let (n, dts) = day15::nb_of_movement_to_reach_oxygen(&code);
+    format!("part1: {}, part2: {}", n, day15::time_to_flood_the_area(&dts))
 }
 
 fn format_micros(t: u128) -> String {

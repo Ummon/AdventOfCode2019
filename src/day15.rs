@@ -1,6 +1,7 @@
 use super::intcode;
 use std::iter::FromIterator;
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
 enum LocationState {
@@ -10,10 +11,13 @@ enum LocationState {
     DeadEnd,
 }
 
-struct DroidTrackingSystem {
+#[derive(Clone)]
+pub struct DroidTrackingSystem {
     board: HashMap<(i32, i32), LocationState>,
     current_path: Vec<(i32, i32)>,
-    oxygen_found: bool
+    oxygen_location: (i32, i32),
+    steps_to_oxygen: i32,
+    all_locations_explored: bool,
 }
 
 impl DroidTrackingSystem {
@@ -21,7 +25,9 @@ impl DroidTrackingSystem {
         DroidTrackingSystem {
             board: HashMap::from_iter(vec![((0, 0), LocationState::Visited)].into_iter()),
             current_path: vec![(0, 0)],
-            oxygen_found: false
+            oxygen_location: (0, 0),
+            steps_to_oxygen: 0,
+            all_locations_explored: false
         }
     }
 
@@ -60,19 +66,25 @@ impl DroidTrackingSystem {
             }
         }
 
-        panic!("Droid stuck");
+        self.all_locations_explored = true;
+        1
     }
 
     // 0: droid hit a wall, 1: droid moved one step, 2: droid moved one step and has found the oxygen system.
     fn reply_from_droid(&mut self, status: i64) {
-        match status {
-            0 => {
-                self.set_state(self.current_position(), LocationState::Wall);
-                self.current_path.pop();
+        if status == 0 {
+            self.set_state(self.current_position(), LocationState::Wall);
+            self.current_path.pop();
+        } else if status == 1 || status == 2 {
+            self.set_state(self.current_position(), LocationState::Visited);
+
+            // We need to explore all positions even if we find the oxygen to compute the time (see 'time_to_flood_the_area') in part 2.
+            if status == 2 {
+                self.steps_to_oxygen = self.current_path.len() as i32 - 1;
+                self.oxygen_location = self.current_position();
             }
-            1 => self.set_state(self.current_position(), LocationState::Visited),
-            2 => self.oxygen_found = true,
-            _ => panic!("Unkown droid status: {}", status)
+        } else {
+            panic!("Unkown droid status: {}", status)
         }
     }
 }
@@ -89,12 +101,34 @@ impl intcode::IO for DroidTrackingSystem {
     }
 
     fn halt(&self) -> bool {
-        self.oxygen_found
+        self.all_locations_explored
     }
 }
 
-pub fn nb_of_movement_to_reach_oxygen(code: &[i64]) -> i32 {
+pub fn nb_of_movement_to_reach_oxygen(code: &[i64]) -> (i32, DroidTrackingSystem) {
     let mut dts = DroidTrackingSystem::new();
     intcode::execute_op_code_with_custom_io(code, &mut dts);
-    dts.current_path.len() as i32 - 1
+    (dts.steps_to_oxygen, dts)
+}
+
+pub fn time_to_flood_the_area(dts: &DroidTrackingSystem) -> i32 {
+    let mut dts = dts.clone(); // To be mutable.
+    dts.current_path = vec![dts.oxygen_location];
+    let mut visited: HashSet<(i32, i32)> = HashSet::from_iter(dts.current_path.iter().copied());
+    let mut max_length = 0;
+
+    'main: while !dts.current_path.is_empty() {
+        for (_, pos) in dts.positions_around() {
+            if dts.get_state(pos) != LocationState::Wall && !visited.contains(&pos) {
+                dts.current_path.push(pos);
+                visited.insert(pos);
+                max_length = max_length.max(dts.current_path.len() as i32);
+                continue 'main;
+            }
+        }
+
+        dts.current_path.pop();
+    }
+
+    max_length - 1
 }
