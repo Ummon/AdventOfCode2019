@@ -61,6 +61,7 @@ fn dft(scale: usize, csum: &[i32]) -> i32 {
     out.abs() % 10
 }
 
+#[allow(dead_code)]
 pub fn part2(input: &[i32]) -> Vec<i32> {
     let size = input.len();
     let mut input = Vec::from_iter(input.iter().cycle().take(size * 10_000).copied());

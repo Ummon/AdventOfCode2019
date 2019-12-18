@@ -21,7 +21,7 @@ pub struct DroidTrackingSystem {
 }
 
 impl DroidTrackingSystem {
-    fn new() -> DroidTrackingSystem {
+    fn new() -> Self {
         DroidTrackingSystem {
             board: HashMap::from_iter(vec![((0, 0), LocationState::Visited)].into_iter()),
             current_path: vec![(0, 0)],
