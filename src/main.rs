@@ -16,6 +16,8 @@ mod day12;
 mod day13;
 mod day14;
 mod day15;
+mod day16;
+mod day17;
 
 fn day01() -> String {
     let masses = common::read_list_of_numbers("data/day01.input", "\n");
@@ -117,6 +119,21 @@ fn day15() -> String {
     format!("part1: {}, part2: {}", n, day15::time_to_flood_the_area(&dts))
 }
 
+fn day16() -> String {
+    let signal_raw = fs::read_to_string("data/day16.input").unwrap();
+    let signal = day16::parse(&signal_raw);
+    let output_part_1 = day16::fft(&signal, &[0, 1, 0, -1], 100, 0, 8, 1);
+    //let output_part_2 = day16::part2(&signal);
+    format!("part1: {}, part2: {}", day16::digits_as_string(&output_part_1), /*day16::digits_as_string(&output_part_2)*/ "<skipped: take too long>")
+}
+
+fn day17() -> String {
+    let code = common::read_list_of_numbers("data/day17.input", ",");
+    let n = day17::scaffold_intersections(&code);
+    format!("part1: {}, part2: {}", n, "")
+
+}
+
 fn format_micros(t: u128) -> String {
     if t < 10_000 {
         format!("{} μs", t)
@@ -151,6 +168,8 @@ fn main() {
         day13,
         day14,
         day15,
+        day16,
+        day17,
     );
 
     let args: Vec<String> = env::args().skip(1).collect();
