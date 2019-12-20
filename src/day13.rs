@@ -1,4 +1,5 @@
 use super::intcode;
+use std::cmp::Ordering;
 use std::convert::TryFrom;
 use itertools::Itertools;
 use num_enum::TryFromPrimitive;
@@ -52,12 +53,10 @@ impl intcode::IO for State {
                     self.paddle_position_x = self.buffer[0];
                 }
                 self.joystick =
-                    if self.paddle_position_x > self.ball_position_x {
-                        -1
-                    } else if self.paddle_position_x < self.ball_position_x {
-                        1
-                    } else {
-                        0
+                    match self.paddle_position_x.cmp(&self.ball_position_x) {
+                        Ordering::Greater => -1,
+                        Ordering::Less => 1,
+                        Ordering::Equal => 0
                     };
             }
             self.buffer.clear();
