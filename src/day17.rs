@@ -1,11 +1,29 @@
 use super::intcode;
 use std::collections::HashSet;
 
+#[derive(PartialEq, Eq, Copy, Clone)]
+enum Direction { Up, Left, Down, Right }
+
+impl Direction {
+    fn from_char(c: char) -> Option<Self> {
+        match c {
+            '^' => Some(Direction::Up),
+            '<' => Some(Direction::Left),
+            'v' => Some(Direction::Down),
+            '>' => Some(Direction::Right),
+             _  => None
+        }
+    }
+}
+
+#[derive(PartialEq, Eq, Copy, Clone)]
+struct MovementCommand { dir: Direction, steps: u32 }
+
 pub struct RobotTrackingSystem {
     output: Vec<i64>,
     board: Vec<Vec<char>>,
     start_position: (i32, i32),
-    start_dir: char,
+    start_dir: Direction,
 }
 
 impl RobotTrackingSystem {
@@ -14,7 +32,7 @@ impl RobotTrackingSystem {
             output: Vec::new(),
             board: Vec::<Vec<char>>::new(),
             start_position: (0, 0),
-            start_dir: '^',
+            start_dir: Direction::Up,
         }
     }
 
@@ -41,10 +59,11 @@ impl RobotTrackingSystem {
                 current_x = 0;
             } else {
                 let c = (*c as u8) as char;
-                if let '^' | '<' | 'v' | '>' = c {
+                if let Some(dir) =  Direction::from_char(c) {
                     self.start_position = (current_x, self.board.len() as i32);
-                    self.start_dir = c;
+                    self.start_dir = dir
                 }
+
                 current_line.push(c);
                 current_x += 1;
             }
@@ -80,7 +99,7 @@ pub fn scaffold_intersections(code: &[i64]) -> i32 {
     visited_locations.insert((x, y));
 
     'main: loop {
-        let positions = [('^', (x, y - 1)), ('<', (x - 1, y)), ('>', (x + 1, y)), ('v', (x, y + 1))];
+        let positions = [(Direction::Up, (x, y - 1)), (Direction::Left, (x - 1, y)), (Direction::Right, (x + 1, y)), (Direction::Down, (x, y + 1))];
 
         let next_position = positions.iter().find(|(d, _)| *d == dir).unwrap().1;
 

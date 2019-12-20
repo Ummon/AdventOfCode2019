@@ -1,4 +1,5 @@
 use std::ops::AddAssign;
+use std::cmp::Ordering;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vector3D {
@@ -35,9 +36,9 @@ fn next_step(moons: &mut Vec<Moon>) {
     let moons_copy = moons.clone();
     for m1 in moons.iter_mut() {
         for m2 in &moons_copy {
-            m1.velocity.x += if m2.position.x > m1.position.x { 1 } else if m2.position.x < m1.position.x { -1 } else { 0 };
-            m1.velocity.y += if m2.position.y > m1.position.y { 1 } else if m2.position.y < m1.position.y { -1 } else { 0 };
-            m1.velocity.z += if m2.position.z > m1.position.z { 1 } else if m2.position.z < m1.position.z { -1 } else { 0 };
+            m1.velocity.x += match m2.position.x.cmp(&m1.position.x) { Ordering::Greater => 1, Ordering::Less => -1, Ordering::Equal => 0 };
+            m1.velocity.y += match m2.position.y.cmp(&m1.position.y) { Ordering::Greater => 1, Ordering::Less => -1, Ordering::Equal => 0 };
+            m1.velocity.z += match m2.position.z.cmp(&m1.position.z) { Ordering::Greater => 1, Ordering::Less => -1, Ordering::Equal => 0 };
         }
     }
 
