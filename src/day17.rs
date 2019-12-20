@@ -1,17 +1,20 @@
 use super::intcode;
 use std::collections::HashSet;
+use std::convert::TryFrom;
 
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
 enum Direction { Up, Left, Down, Right }
 
-impl Direction {
-    fn from_char(c: char) -> Option<Self> {
+impl TryFrom<char> for Direction {
+    type Error = ();
+
+    fn try_from(c: char) -> Result<Self, ()> {
         match c {
-            '^' => Some(Direction::Up),
-            '<' => Some(Direction::Left),
-            'v' => Some(Direction::Down),
-            '>' => Some(Direction::Right),
-             _  => None
+            '^' => Ok(Direction::Up),
+            '<' => Ok(Direction::Left),
+            'v' => Ok(Direction::Down),
+            '>' => Ok(Direction::Right),
+             _  => Err(())
         }
     }
 }
@@ -66,7 +69,7 @@ impl RobotTrackingSystem {
                 current_x = 0;
             } else {
                 let c = (*c as u8) as char;
-                if let Some(dir) =  Direction::from_char(c) {
+                if let Ok(dir) =  Direction::try_from(c) {
                     self.start_position = (current_x, self.board.len() as i32);
                     self.start_dir = dir
                 }
