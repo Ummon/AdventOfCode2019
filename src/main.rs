@@ -7,6 +7,7 @@ mod intcode;
 mod day01;
 mod day02;
 mod day03;
+mod day04;
 mod day06;
 mod day07;
 mod day08;
@@ -18,6 +19,7 @@ mod day14;
 mod day15;
 mod day16;
 mod day17;
+mod day18;
 
 fn day01() -> String {
     let masses = common::read_list_of_numbers("data/day01.input", "\n");
@@ -40,7 +42,9 @@ fn day03() -> String {
 }
 
 fn day04() -> String {
-    format!("")
+    let raw = fs::read_to_string("data/day04.input").unwrap();
+    let (min, max) = day04::parse_range(&raw);
+    format!("part1: {:?}, part2: {}", day04::nb_passwords_part1(min, max), day04::nb_passwords_part2(min, max))
 }
 
 fn day05() -> String {
@@ -136,6 +140,10 @@ fn day17() -> String {
 
 }
 
+fn day18() -> String {
+    format!("part1: {}, part2: {}", "", "")
+}
+
 fn format_micros(t: u128) -> String {
     if t < 10_000 {
         format!("{} μs", t)
@@ -172,6 +180,7 @@ fn main() {
         day15,
         day16,
         day17,
+        day18,
     );
 
     let args: Vec<String> = env::args().skip(1).collect();

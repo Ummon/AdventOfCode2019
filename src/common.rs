@@ -9,7 +9,7 @@ where
     T::Err: std::fmt::Debug
 
 {
-    fs::read_to_string(file).unwrap().split(sep).map(|line| line.parse::<T>().unwrap()).collect()
+    fs::read_to_string(file).unwrap().split(sep).map(|line| line.trim().parse::<T>().unwrap()).collect()
 }
 
 pub fn layer_to_printable_string(layer: &[u8], width: usize) -> String {

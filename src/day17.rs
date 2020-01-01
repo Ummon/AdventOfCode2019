@@ -139,7 +139,7 @@ impl RobotTrackingSystem {
 }
 
 impl intcode::IO for RobotTrackingSystem {
-    // May block.
+    // Read instructions 
     fn read(&mut self) -> i64 {
         self.build_board_from_output();
         42 // TODO: part2.
