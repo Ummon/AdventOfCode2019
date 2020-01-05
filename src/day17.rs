@@ -31,7 +31,9 @@ pub struct RobotTrackingSystem {
     start_position: (i32, i32),
     start_dir: Direction,
     crossings: Vec<(i32, i32)>,
+
     dir_commands: Vec<MovementCommand>,
+    commands_sequences: [Vec<(i32, i32)>; 3], // 3 sequences: A, B and C.
 }
 
 impl RobotTrackingSystem {
@@ -43,6 +45,7 @@ impl RobotTrackingSystem {
             start_dir: Direction::Up,
             crossings: Vec::<(i32, i32)>::new(),
             dir_commands: Vec::<MovementCommand>::new(),
+            commands_sequences: [Vec::<(i32, i32)>::new(), Vec::<(i32, i32)>::new(), Vec::<(i32, i32)>::new()],
         }
     }
 
@@ -136,13 +139,20 @@ impl RobotTrackingSystem {
             break;
         }
     }
+
+    fn find_sequences(&mut self) {
+        if !self.commands_sequences[0].is_empty() { return; }
+
+
+    }
 }
 
 impl intcode::IO for RobotTrackingSystem {
-    // Read instructions 
+    // Read instructions
     fn read(&mut self) -> i64 {
         self.build_board_from_output();
-        42 // TODO: part2.
+        self.find_sequences();
+        42
     }
 
     // Send to the output channel.
@@ -165,4 +175,23 @@ pub fn part2(code: &[i64]) {
     let mut rts = RobotTrackingSystem::new();
     intcode::execute_op_code_with_custom_io(code, &mut rts);
 
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use itertools::Itertools;
+
+    #[test]
+    fn foo() {
+        let array = vec![1, 2, 3];
+        let s: i32 = array.iter().sum();
+        dbg!(s);
+        let mut combinations: Vec<Vec<i32>> = (3..=7).combinations_with_replacement(3).sorted_by(|v1, v2| {
+            let s1: i32 = v1.iter().sum();
+            let s2: i32 = v2.iter().sum();
+            s1.cmp(&s2)
+        }).collect();
+        println!("{:?}", combinations);
+    }
 }
