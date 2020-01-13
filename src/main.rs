@@ -133,11 +133,10 @@ fn day16() -> String {
 
 fn day17() -> String {
     let mut code = common::read_list_of_numbers("data/day17.input", ",");
-    let n = day17::scaffold_intersections(&code);
+    let intersections = day17::scaffold_intersections(&code);
     code[0] = 2;
-    day17::part2(&code);
-    format!("part1: {}, part2: {}", n, "")
-
+    let dust = day17::collected_dust(&code);
+    format!("part1: {}, part2: {}", intersections, dust)
 }
 
 fn day18() -> String {

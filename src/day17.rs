@@ -1,6 +1,8 @@
 use super::intcode;
+use itertools::Itertools;
 use std::collections::HashSet;
 use std::convert::TryFrom;
+use std::ops::Range;
 
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
 enum Direction { Up, Left, Down, Right }
@@ -25,28 +27,47 @@ enum Movement { Left, Right }
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
 struct MovementCommand { mov: Movement, steps: u32 }
 
-pub struct RobotTrackingSystem {
-    output: Vec<i64>,
+struct RobotTrackingSystem {
     board: Vec<Vec<char>>,
     start_position: (i32, i32),
     start_dir: Direction,
-    crossings: Vec<(i32, i32)>,
-
     dir_commands: Vec<MovementCommand>,
-    commands_sequences: [Vec<(i32, i32)>; 3], // 3 sequences: A, B and C.
+    crossings: Vec<(i32, i32)>,
 }
 
 impl RobotTrackingSystem {
     fn new() -> Self {
         RobotTrackingSystem {
-            output: Vec::new(),
             board: Vec::<Vec<char>>::new(),
             start_position: (0, 0),
             start_dir: Direction::Up,
-            crossings: Vec::<(i32, i32)>::new(),
             dir_commands: Vec::<MovementCommand>::new(),
-            commands_sequences: [Vec::<(i32, i32)>::new(), Vec::<(i32, i32)>::new(), Vec::<(i32, i32)>::new()],
+            crossings: Vec::<(i32, i32)>::new(),
         }
+    }
+
+    fn from(output: &[i64]) -> Self {
+        let mut rts = RobotTrackingSystem::new();
+        let mut current_line = Vec::<char>::new();
+        let mut current_x = 0;
+        for c in output.iter() {
+            if *c == 10 {
+                rts.board.push(current_line);
+                current_line = Vec::<char>::new();
+                current_x = 0;
+            } else {
+                let c = (*c as u8) as char;
+                if let Ok(dir) =  Direction::try_from(c) {
+                    rts.start_position = (current_x, rts.board.len() as i32);
+                    rts.start_dir = dir
+                }
+
+                current_line.push(c);
+                current_x += 1;
+            }
+        }
+        rts.run_through();
+        rts
     }
 
     fn get(&self, x: i32, y: i32) -> Option<char> {
@@ -55,35 +76,6 @@ impl RobotTrackingSystem {
         } else {
             None
         }
-    }
-
-    fn build_board_from_output(&mut self) {
-        // If the board has already been read.
-        if !self.board.is_empty() {
-            return;
-        }
-
-        let mut current_line = Vec::<char>::new();
-        let mut current_x = 0;
-        for c in self.output.iter() {
-            if *c == 10 {
-                self.board.push(current_line);
-                current_line = Vec::<char>::new();
-                current_x = 0;
-            } else {
-                let c = (*c as u8) as char;
-                if let Ok(dir) =  Direction::try_from(c) {
-                    self.start_position = (current_x, self.board.len() as i32);
-                    self.start_dir = dir
-                }
-
-                current_line.push(c);
-                current_x += 1;
-            }
-        }
-
-        self.output.clear();
-        self.run_through();
     }
 
     // Run the path and find the crossings and define the movements.
@@ -139,20 +131,127 @@ impl RobotTrackingSystem {
             break;
         }
     }
+}
 
-    fn find_sequences(&mut self) {
-        if !self.commands_sequences[0].is_empty() { return; }
+struct CommandSequences {
+    commands: Vec<(usize, Range<usize>)> // Each range is associated with a sequence number (first tuple value).
+}
 
+fn is_overlapping<T : PartialOrd>(r1: &Range<T>, r2: &Range<T>) -> bool {
+    r1.start < r2.start && r1.end > r2.start || r2.start < r1.start && r2.end > r1.start
+}
 
+impl CommandSequences {
+    fn new() -> Self {
+        CommandSequences {
+            commands: Vec::new()
+        }
+    }
+
+    fn find_sequences(&mut self, movements: &[MovementCommand]) {
+        // For each sequence length we try to match them agains the movements.
+        let len_min = 3;
+        let len_max = 6;
+
+        for l1 in len_min ..= len_max {
+            for l2 in len_min ..= len_max {
+                for l3 in len_min ..= len_max {
+                    self.commands.clear();
+                    let mut position: usize = 0;
+                    for seq_num in 0 .. 3 {
+                        let l = match seq_num { 0 => l1, 1 => l2, _ => l3 };
+                        let range = position .. position + l;
+                        self.commands.push((seq_num, range.clone()));
+                        // Try to find the sequence elsewhere in 'movements'.
+                        let mut position2 = position + l;
+                        while position2 <= movements.len() - l {
+                            let range2 = position2 .. position2 + l;
+                            if !self.commands.iter().any(|(_, r)| is_overlapping(&r, &range2)) && movements.get(range.clone()) == movements.get(range2.clone()) {
+                                self.commands.push((seq_num, range2));
+                                position2 += l;
+                            } else {
+                                position2 += 1;
+                            }
+                        }
+
+                        // Update position to the next free position.
+                        while self.commands.iter().any(|(_, r)| r.contains(&position)) {
+                            position += 1;
+                        }
+                    }
+
+                    // Check if all movements are included into a sequence.
+                    if self.commands.iter().fold(0, |sum, (_, range)| sum + range.len()) == movements.len() {
+                        return;
+                    }
+                }
+
+            }
+        }
     }
 }
 
-impl intcode::IO for RobotTrackingSystem {
+struct Part1 { output: Vec<i64>, }
+
+impl Part1 { fn new() -> Self { Part1 { output: Vec::<i64>::new() } }}
+
+struct Part2 {
+    output: Vec<i64>,
+    rts: Option<RobotTrackingSystem>,
+    commands_sequences: CommandSequences,
+    input: Vec<i64>,
+    input_position: usize,
+    dust_collected: i64,
+}
+
+impl Part2 { fn new() -> Self { Part2 { output: Vec::<i64>::new(), rts: None, commands_sequences: CommandSequences::new(), input: Vec::new(), input_position: 0, dust_collected: 0 } } }
+
+impl intcode::IO for Part1 {
     // Read instructions
+    fn read(&mut self) -> i64 { 0 }
+
+    // Send to the output channel.
+    fn write(&mut self, value: i64) {
+        self.output.push(value);
+    }
+}
+
+impl intcode::IO for Part2 {
+    // Read instructions.
     fn read(&mut self) -> i64 {
-        self.build_board_from_output();
-        self.find_sequences();
-        42
+        if self.rts.is_none() {
+            self.rts = Some(RobotTrackingSystem::from(&self.output));
+            self.commands_sequences.find_sequences(&self.rts.as_ref().unwrap().dir_commands);
+
+            // 1: add the movements sequences: "A,B,C,A\n" // Max: 10 sequence calls.
+            for (i, (seq_num, _)) in self.commands_sequences.commands.iter().sorted_by(|(_, r1), (_, r2)| r1.start.cmp(&r2.start)).enumerate() {
+                if i > 0 { self.input.push(44); }
+                self.input.push(*seq_num as i64 + 65);
+            }
+            self.input.push(10);
+
+            // 2: Add the sequence A, B and C: "R,8,L,2,R,1\n", Max: ~6 movements.
+            for seq_num in 0 .. 3 {
+                let (_, sequence) = self.commands_sequences.commands.iter().find(|(s, _)| *s == seq_num).unwrap();
+                for (i, movement_command) in self.rts.as_ref().unwrap().dir_commands.get(sequence.clone()).unwrap().iter().enumerate() {
+
+                    if i > 0 { self.input.push(44); }
+                    if movement_command.mov == Movement::Left { self.input.push(76); } else { self.input.push(82); }
+                    self.input.push(44);
+                    for c in movement_command.steps.to_string().as_bytes() {
+                        self.input.push(*c as i64);
+                    }
+                }
+                self.input.push(10);
+            }
+
+            // 3: Add "y\n" (continuous video feed activated) or "n\n" (no video).
+            self.input.push(110);
+            self.input.push(10);
+        }
+
+        self.input_position += 1;
+        self.input[self.input_position - 1]
     }
 
     // Send to the output channel.
@@ -161,37 +260,19 @@ impl intcode::IO for RobotTrackingSystem {
     }
 
     fn finished(&mut self) {
-        self.build_board_from_output();
+        self.dust_collected = *self.output.last().unwrap();
     }
 }
 
 pub fn scaffold_intersections(code: &[i64]) -> i32 {
-    let mut rts = RobotTrackingSystem::new();
-    intcode::execute_op_code_with_custom_io(code, &mut rts);
+    let mut part1 = Part1::new();
+    intcode::execute_op_code_with_custom_io(code, &mut part1);
+    let rts = RobotTrackingSystem::from(&part1.output);
     rts.crossings.iter().fold(0, |sum, crossing| sum + crossing.0 * crossing.1)
 }
 
-pub fn part2(code: &[i64]) {
-    let mut rts = RobotTrackingSystem::new();
-    intcode::execute_op_code_with_custom_io(code, &mut rts);
-
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use itertools::Itertools;
-
-    #[test]
-    fn foo() {
-        let array = vec![1, 2, 3];
-        let s: i32 = array.iter().sum();
-        dbg!(s);
-        let mut combinations: Vec<Vec<i32>> = (3..=7).combinations_with_replacement(3).sorted_by(|v1, v2| {
-            let s1: i32 = v1.iter().sum();
-            let s2: i32 = v2.iter().sum();
-            s1.cmp(&s2)
-        }).collect();
-        println!("{:?}", combinations);
-    }
+pub fn collected_dust(code: &[i64]) -> i64 {
+    let mut part2 = Part2::new();
+    intcode::execute_op_code_with_custom_io(code, &mut part2);
+    part2.dust_collected
 }

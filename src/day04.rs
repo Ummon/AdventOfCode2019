@@ -37,14 +37,14 @@ pub fn nb_passwords_part2(min: i32, max: i32) -> i32 {
         &|digits: &Digits| {
             let mut last = digits[0];
             let mut n = 1;
-            for i in 1 .. digits.len() {
-                if digits[i] == last {
+            for d in &digits[1..] {
+                if *d == last {
                     n += 1;
                 } else {
                     if n == 2 { return true; }
                     n = 1;
                 }
-                last = digits[i];
+                last = *d;
             }
             n == 2
         }
@@ -57,7 +57,7 @@ fn nb_passwords(min: i32, max: i32, valid_password: &dyn Fn(&Digits) -> bool) ->
     let l = digits.len();
 
     fn set_range(from: usize, to: usize, value: u8, digits: &mut Digits) {
-        for i in from .. to { digits[i] = value; }
+        for d in &mut digits[from .. to] { *d = value; }
     };
 
     for i in (1 .. l).rev() {
