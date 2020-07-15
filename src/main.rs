@@ -140,7 +140,11 @@ fn day17() -> String {
 }
 
 fn day18() -> String {
-    format!("part1: {}, part2: {}", "", "")
+    let vault_raw = fs::read_to_string("data/day18.input").unwrap();
+    let vault = day18::Vault::parse(&vault_raw);
+    let nb_steps = day18::nb_steps_to_collect_all_key(&vault);
+
+    format!("part1: {}, part2: {}", nb_steps, "")
 }
 
 fn format_micros(t: u128) -> String {
