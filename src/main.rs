@@ -197,9 +197,14 @@ fn main() {
         println!("Time to execute all days: {}", format_micros(now.elapsed().as_micros()));
     } else {
         for arg in args {
-            let day = arg.parse::<usize>().unwrap();
-            if day > days.len() { panic!("Unknown day: {}", day) }
-            do_day(&days, day)
+            match arg.parse::<usize>() {
+                Ok(day) if day >= 1 && day <= days.len() =>
+                    do_day(&days, day),
+                Ok(day) =>
+                    println!("Unknown day: {}", day),
+                Err(error) =>
+                    println!("Unable to parse day number: \"{}\", error: {}", arg, error)
+            }
         }
     }
 }
