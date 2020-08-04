@@ -127,8 +127,8 @@ fn day16() -> String {
     let signal_raw = fs::read_to_string("data/day16.input").unwrap();
     let signal = day16::parse(&signal_raw);
     let output_part_1 = day16::fft(&signal, &[0, 1, 0, -1], 100, 0, 8, 1);
-    //let output_part_2 = day16::part2(&signal);
-    format!("part1: {}, part2: {}", day16::digits_as_string(&output_part_1), /*day16::digits_as_string(&output_part_2)*/ "<skipped: take too long>")
+    // let output_part_2 = day16::part2(&signal);
+    format!("part1: {}, part2: {}", day16::digits_as_string(&output_part_1), /*day16::digits_as_string(&output_part_2)*/ "<skipped: take too long ~ 1 min>")
 }
 
 fn day17() -> String {
