@@ -1,6 +1,5 @@
 use itertools::Itertools;
 use std::collections::HashSet;
-use std::cmp::Ordering;
 use std::rc::Rc;
 
 #[derive(Debug)]
@@ -84,6 +83,7 @@ mod v1 {
         iter(node).any(|node| node.key == key)
     }
 
+    #[allow(dead_code)]
     pub fn nb_steps_to_collect_all_key(vault: &Vault) -> u32 {
         //dbg!(vault);
 
@@ -102,7 +102,7 @@ mod v1 {
                 for pos_d in &[(-1, 0), (0, 1), (1, 0), (0, -1)] {
                     let adjacent = (pos.0 + pos_d.0, pos.1 + pos_d.1);
                     //println!("Adjacent: {:?}", adjacent);
-                    if adjacent.0 >= 0 && adjacent.0 < vault.tunnels.len() as i32 && adjacent.1 >= 0 && adjacent.1 < vault.tunnels[0].len() as i32 && !visited_positions.contains(&adjacent) {
+                    if !visited_positions.contains(&adjacent) {
                         match vault.tunnels[adjacent.0 as usize][adjacent.1 as usize] {
                             // Simple floor or a door or a owned key.
                             c if c == FLOOR_SYMBOL || c == START_SYMBOL || c.is_ascii_uppercase() && can_open(Rc::clone(&parent), c) || c.is_ascii_lowercase() && has_key(Rc::clone(&parent), c) => {
@@ -115,7 +115,7 @@ mod v1 {
                                 let node = Rc::new(Node::new(Some(Rc::clone(&parent)), steps, c));
                                 reachable_keys.append(&mut find_keys(adjacent, node, vault));
                             },
-                            WALL_SYMBOL | _ => (), //println!("-> WALL"),
+                            _ => (), //println!("-> WALL"),
                         }
                     }
                 }
@@ -131,7 +131,7 @@ mod v1 {
         let root = Rc::new(Node::new(None, 0, START_SYMBOL));
         let nodes = find_keys(vault.entrance, root, vault);
 
-        nodes.iter().map(|n| (length(Rc::clone(n)), nb_of_keys(Rc::clone(n)))).sorted_by(|(l1, n1), (l2, n2)| n1.cmp(&n2).then(l1.cmp(&l2))).nth(0).unwrap().0
+        nodes.iter().map(|n| (length(Rc::clone(n)), nb_of_keys(Rc::clone(n)))).sorted_by(|(l1, n1), (l2, n2)| n1.cmp(&n2).then(l1.cmp(&l2))).next().unwrap().0
     }
 }
 
@@ -163,10 +163,10 @@ mod v2 {
             step += 1;
             let mut new_paths: Vec<Path> = Vec::new();
 
-            //println!("{:?}", paths);
+            println!("----------------------------\n{:?}", paths);
 
             for i in (0 .. paths.len()).rev() {
-                let mut path = &mut paths[i];
+                let path = &mut paths[i];
 
                 let to_visit = path.to_visit.clone();
                 path.to_visit.clear();
@@ -178,10 +178,12 @@ mod v2 {
                     path.visited.insert(pos);
                     for pos_d in &[(-1, 0), (0, 1), (1, 0), (0, -1)] {
                         let adjacent = (pos.0 + pos_d.0, pos.1 + pos_d.1);
-                        if adjacent.0 >= 0 && adjacent.0 < vault.tunnels.len() as i32 && adjacent.1 >= 0 && adjacent.1 < vault.tunnels[0].len() as i32 && !visited.contains(&adjacent) {
+                        if !visited.contains(&adjacent) {
                             let c = vault.tunnels[adjacent.0 as usize][adjacent.1 as usize];
 
-                            if c.is_ascii_lowercase() && !path.keys.contains(&c) {
+                            if c == WALL_SYMBOL {
+                            }
+                            else if c.is_ascii_lowercase() && !path.keys.contains(&c) {
                                 if path.keys.len() + 1 == nb_of_keys {
                                     return step;
                                 }
@@ -198,7 +200,7 @@ mod v2 {
                     }
                 }
 
-                if path.to_visit.len() == 0 {
+                if path.to_visit.is_empty() {
                     paths.remove(i);
                 }
             }
@@ -227,6 +229,8 @@ mod tests {
 
         let steps_v1 = v1::nb_steps_to_collect_all_key(&vault);
         let steps_v2 = v2::nb_steps_to_collect_all_key(&vault);
+
+        assert_eq!(steps_v1, steps_v2);
 
         println!("Steps: {}", steps_v1);
     }
@@ -285,11 +289,30 @@ mod tests {
         let vault = Vault::parse(input);
 
         //let steps_v1 = v1::nb_steps_to_collect_all_key(&vault);
-        //let steps_v2 = v2::nb_steps_to_collect_all_key(&vault);
+        let steps_v2 = v2::nb_steps_to_collect_all_key(&vault);
 
         //assert_eq!(steps_v1, steps_v2);
 
-        //println!("Steps: {}", steps_v2);
+        println!("Steps: {}", steps_v2);
+    }
+
+    #[test]
+    fn part1_sample4b() {
+        let input =
+            "#################
+             #j.A..b...a..D.o#
+             ########@########
+             #k.E..e...d..B.n#
+             #################";
+
+        let vault = Vault::parse(input);
+
+        //let steps_v1 = v1::nb_steps_to_collect_all_key(&vault);
+        let steps_v2 = v2::nb_steps_to_collect_all_key(&vault);
+
+        //assert_eq!(steps_v1, steps_v2);
+
+        println!("Steps: {}", steps_v2);
     }
 
     #[test]
