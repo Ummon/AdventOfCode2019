@@ -15,14 +15,12 @@ const FLOOR_SYMBOL: char = '.';
 impl Vault {
     pub fn parse(input: &str) -> Self {
         let mut tunnels = Vec::<Vec<char>>::new();
-        let mut row = 0;
         let mut entrance = (0, 0);
-        for line in input.lines() {
+        for (row, line) in input.lines().enumerate() {
             tunnels.push(line.trim().chars().collect::<Vec<char>>());
             if let Some((col, _)) = tunnels.last().unwrap().iter().find_position(|c| c == &&START_SYMBOL) {
-                entrance = (row, col as i32);
+                entrance = (row as i32, col as i32);
             }
-            row += 1;
         }
         Vault { tunnels, entrance }
     }
