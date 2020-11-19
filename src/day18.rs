@@ -26,6 +26,7 @@ impl Vault {
     }
 }
 
+// Version 1: flood algorithm.
 mod v1 {
     use super::*;
 
@@ -83,37 +84,41 @@ mod v1 {
 
     #[allow(dead_code)]
     pub fn nb_steps_to_collect_all_key(vault: &Vault) -> u32 {
-        //dbg!(vault);
-
         fn find_keys(from : (i32, i32), parent: Rc<Node>, vault: &Vault) -> Vec<Rc<Node>> {
             let mut to_visit = vec![(from, 1)];
             let mut visited_positions: HashSet<(i32, i32)> = HashSet::new();
             let mut reachable_keys = Vec::<Rc<Node>>::new();
 
-            //println!("find_keys: from:{:?}", from);
-            //println!("Nb of keys: {}", nb_of_keys(Rc::clone(&parent)));
+            if cfg!(debug_assertions) {
+                println!("find_keys: from:{:?}", from);
+                println!("Nb of keys: {}", nb_of_keys(Rc::clone(&parent)));
+            }
 
             while let Some((pos, steps)) = to_visit.pop() {
-                //println!("Pos to visit: {:?}", pos);
+
+                if cfg!(debug_assertions) { println!("Pos to visit: {:?}", pos); }
+
                 visited_positions.insert(pos);
-                //steps += 1;
+
                 for pos_d in &[(-1, 0), (0, 1), (1, 0), (0, -1)] {
                     let adjacent = (pos.0 + pos_d.0, pos.1 + pos_d.1);
-                    //println!("Adjacent: {:?}", adjacent);
+
+                    if cfg!(debug_assertions) { println!("Adjacent: {:?}", adjacent); }
+
                     if !visited_positions.contains(&adjacent) {
                         match vault.tunnels[adjacent.0 as usize][adjacent.1 as usize] {
                             // Simple floor or a door or a owned key.
                             c if c == FLOOR_SYMBOL || c == START_SYMBOL || c.is_ascii_uppercase() && can_open(Rc::clone(&parent), c) || c.is_ascii_lowercase() && has_key(Rc::clone(&parent), c) => {
-                                //println!("-> To visit");
+                                if cfg!(debug_assertions) { println!("-> To visit"); }
                                 to_visit.push((adjacent, steps + 1));
                             },
                             c if c.is_ascii_lowercase() => { // A non-owned key.
-                                //println!("-> A new key! {:?}", c);
+                                if cfg!(debug_assertions) { println!("-> A new key! {:?}", c); }
                                 visited_positions.insert(adjacent);
                                 let node = Rc::new(Node::new(Some(Rc::clone(&parent)), steps, c));
                                 reachable_keys.append(&mut find_keys(adjacent, node, vault));
                             },
-                            _ => (), //println!("-> WALL"),
+                            _ => if cfg!(debug_assertions) { println!("-> WALL") },
                         }
                     }
                 }
@@ -152,7 +157,7 @@ mod v2 {
     pub fn nb_steps_to_collect_all_key(vault: &Vault) -> u32 {
         let nb_of_keys: usize = vault.tunnels.iter().map(|line| line.iter().fold(0, |acc, c| if c.is_ascii_lowercase() { acc + 1 } else { acc })).sum();
 
-        println!("nb_of_keys = {}", nb_of_keys);
+        if cfg!(debug_assertions) { println!("nb_of_keys = {}", nb_of_keys); }
 
         let mut paths = vec![Path::new(vault.entrance)];
 
@@ -161,7 +166,7 @@ mod v2 {
             step += 1;
             let mut new_paths: Vec<Path> = Vec::new();
 
-            println!("----------------------------\n{:?}", paths);
+            if cfg!(debug_assertions) { println!("----------------------------\n{:?}", paths); }
 
             for i in (0 .. paths.len()).rev() {
                 let path = &mut paths[i];
@@ -224,8 +229,12 @@ mod tests {
              #########";
 
         let vault = Vault::parse(input);
+        dbg!(&vault);
 
+        if cfg!(debug_assertions) { println!("===== Version 1 =====") }
         let steps_v1 = v1::nb_steps_to_collect_all_key(&vault);
+
+        if cfg!(debug_assertions) { println!("===== Version 2 =====") }
         let steps_v2 = v2::nb_steps_to_collect_all_key(&vault);
 
         assert_eq!(steps_v1, steps_v2);
