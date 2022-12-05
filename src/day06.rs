@@ -1,5 +1,4 @@
-use std::collections::HashMap;
-use std::cmp;
+use std::{cmp, collections::HashMap};
 
 // All planets indexing their parent (planet -> parent).
 type Orbits = HashMap<String, String>;

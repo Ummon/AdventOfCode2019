@@ -1,7 +1,4 @@
-use std::iter::Iterator;
-use std::iter::FromIterator;
-use std::collections::HashSet;
-use std::collections::HashMap;
+use std::{collections::{HashMap, HashSet}, iter::{Iterator, FromIterator}};
 
 pub fn split_movements(movements: &str) -> Vec<&str> {
     movements.split(',').collect()

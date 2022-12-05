@@ -1,5 +1,4 @@
-use std::ops::AddAssign;
-use std::cmp::Ordering;
+use std::{cmp::Ordering, ops::AddAssign};
 
 #[derive(Debug, Copy, Clone)]
 pub struct Vector3D {

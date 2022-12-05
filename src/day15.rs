@@ -1,7 +1,6 @@
+use std::{collections::{HashMap, HashSet}, iter::FromIterator};
+
 use super::intcode;
-use std::iter::FromIterator;
-use std::collections::HashMap;
-use std::collections::HashSet;
 
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
 enum LocationState {

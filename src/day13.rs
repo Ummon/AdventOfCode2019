@@ -1,8 +1,9 @@
-use super::intcode;
-use std::cmp::Ordering;
-use std::convert::TryFrom;
+use std::{cmp::Ordering, convert::TryFrom};
+
 use itertools::Itertools;
 use num_enum::TryFromPrimitive;
+
+use super::intcode;
 
 // Not neccesary, to try to parse enum in Rust.
 #[derive(Debug, Eq, PartialEq, TryFromPrimitive)]

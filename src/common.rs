@@ -1,6 +1,4 @@
-use std::fs;
-use std::path::Path;
-use std::str::FromStr;
+use std::{fs, path::Path, str::FromStr};
 
 pub fn read_list_of_numbers<P, T>(file: P, sep: &str) -> Vec<T>
 where

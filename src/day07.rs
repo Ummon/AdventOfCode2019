@@ -1,7 +1,9 @@
-use super::intcode;
+use std::sync::{Arc, Barrier, mpsc::{self, Sender, Receiver}, atomic::{AtomicI64, Ordering}};
+
 use itertools::Itertools;
-use std::sync::{ Arc, Barrier, mpsc::{ self, Sender, Receiver }, atomic::{ AtomicI64, Ordering } };
 use threadpool::ThreadPool;
+
+use super::intcode;
 
 fn last_thruster_signal(code: &[i64], phase_setting: &[i64]) -> i64 {
     phase_setting.iter().fold(0, |last_output, input| intcode::execute_op_code(&code, &[*input, last_output])[0])

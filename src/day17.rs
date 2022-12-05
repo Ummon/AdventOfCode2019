@@ -1,8 +1,8 @@
-use super::intcode;
+use std::{collections::HashSet, convert::TryFrom, ops::Range};
+
 use itertools::Itertools;
-use std::collections::HashSet;
-use std::convert::TryFrom;
-use std::ops::Range;
+
+use super::intcode;
 
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
 enum Direction { Up, Left, Down, Right }

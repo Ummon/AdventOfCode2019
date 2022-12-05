@@ -58,7 +58,7 @@ fn nb_passwords(min: i32, max: i32, valid_password: &dyn Fn(&Digits) -> bool) ->
 
     fn set_range(from: usize, to: usize, value: u8, digits: &mut Digits) {
         for d in &mut digits[from .. to] { *d = value; }
-    };
+    }
 
     for i in (1 .. l).rev() {
         if digits[i - 1] < digits[i] {

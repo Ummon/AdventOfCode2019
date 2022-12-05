@@ -73,7 +73,7 @@ pub fn execute_op_code_with_custom_io(code: &[i64], io: &mut dyn IO) {
             Mode::Immediate => code[position],
             Mode::Relative => if (code[position] + relative_base) as usize >= code.len() { 0 } else { code[(code[position] + relative_base) as usize] }
         }
-    };
+    }
 
     fn write(position: usize, value: i64, code: &mut Vec<i64>, mode: Mode, relative_base: i64) {
         let ref_position =
@@ -97,7 +97,7 @@ pub fn execute_op_code_with_custom_io(code: &[i64], io: &mut dyn IO) {
         } else {
             cursor + 3
         }
-    };
+    }
 
     loop {
         if io.halt() { break; }
